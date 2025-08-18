@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
-import HomePage from "./routes/Homepage";
+import HomePage from "./routes/HomePage";
 import PostListPage from "./routes/PostListPage";
 import Write from "./routes/Write";
 import LoginPage from "./routes/LoginPage";
@@ -20,8 +20,8 @@ const router = createBrowserRouter([
       { path: "/post/:slug", element: <SinglePostPage /> },
       { path: "/write", element: <Write /> },
     ],
- },
-  // ❌ These are OUTSIDE MainLayout (no Navbar)
+  },
+  // Standalone routes (no MainLayout wrapper)
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
 ]);

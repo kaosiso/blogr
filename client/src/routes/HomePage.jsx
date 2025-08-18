@@ -1,19 +1,19 @@
 import React from "react";
 import Hero from "../components/Hero";
 import FeaturedPosts from "../components/FeaturedPosts";
-import Categories from "../components/Categories";
 import Footer from "../components/Footer";
 import CalltoAction from "../components/CalltoAction";
-
+import PostListPage from "./PostListPage";
+import MainCategories from "../components/MainCategories";
 const HomePage = () => {
   return (
     <>
       {/* Hero Section */}
       <Hero />
-      <Categories />
+      <MainCategories/>
       <FeaturedPosts />
+      <PostListPage/>
       <CalltoAction />
-      <Footer />
     </>
   );
 };

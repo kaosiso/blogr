@@ -9,7 +9,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="w-full h-16 md:h-20 flex items-center justify-between px-4 relative">
+    <div className="w-full h-16 md:h-20 flex items-center z-1000 justify-between px-4 relative">
       {/* logo */}
       <Link to="/" className="flex items-center gap-3 text-2xl font-bold">
          <Image
@@ -19,7 +19,7 @@ const Navbar = () => {
           h={32}
           className="w-8 h-8"
         />
-        <span>Blogr</span>
+        <span>blogr</span>
       </Link>
 
       {/* desktop menu */}
@@ -65,7 +65,7 @@ const Navbar = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute top-16 left-0 w-full bg-[#fdf6e3] flex flex-col items-center gap-4 py-6 md:hidden shadow-md"
+            className="absolute top-16 left-0 w-full bg-[#fdf6e3] flex flex-col items-center z-50  gap-4 py-6 md:hidden"
           >
             <Link to="/" onClick={() => setOpen(false)}>
               Home
