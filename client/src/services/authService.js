@@ -1,39 +1,49 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000"; // your backend URL
+const API_URL = "http://localhost:3000"; // adjust if needed
 
-// Login user
 export const login = async (email, password) => {
   const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-  if (res.data.token) {
-    localStorage.setItem("token", res.data.token); // save JWT locally
+  const { token, user } = res.data;
+  if (token && user) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    window.dispatchEvent(new Event("storage"));
+    return user;
   }
-  return res.data.user;
+  throw new Error("Login failed");
 };
 
-// Register user
 export const register = async (name, email, password) => {
   const res = await axios.post(`${API_URL}/auth/register`, {
     name,
     email,
     password,
   });
-  if (res.data.token) {
-    localStorage.setItem("token", res.data.token);
+  const { token, user } = res.data;
+  if (token && user) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    window.dispatchEvent(new Event("storage"));
+    return user;
   }
-  return res.data.user;
+  throw new Error("Registration failed");
 };
 
-// Get current logged-in user profile
 export const getProfile = async () => {
   const token = localStorage.getItem("token");
+  if (!token) return null;
+
   const res = await axios.get(`${API_URL}/auth/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  const user = res.data.user;
+  if (user) localStorage.setItem("user", JSON.stringify(user));
+  return user;
 };
 
-// Logout user
 export const logout = () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.dispatchEvent(new Event("storage"));
 };

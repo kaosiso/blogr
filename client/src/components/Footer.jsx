@@ -14,7 +14,7 @@ const Footer = () => {
           >
             <Image
               src="logo.png"
-              alt="Blogr Logo"
+              alt="Blogr"
               w={32}
               h={32}
               className="w-8 h-8"

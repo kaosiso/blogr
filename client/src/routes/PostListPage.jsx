@@ -6,6 +6,7 @@ import SideMenu from "../components/SideMenu";
 const PostListPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
+   
   const posts = [
     {
       image: "featured1.jpeg",

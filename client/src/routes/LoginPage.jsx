@@ -9,17 +9,24 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const user = await login(email, password);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const user = await login(email, password);
-      toast.success("Login successful!");
-      navigate("/"); // redirect after login
-    } catch (error) {
-      toast.error(error.response?.data?.error || "Login failed");
-    }
-  };
+    // ✅ Save user to localStorage
+    localStorage.setItem("user", JSON.stringify(user));
+
+    // ✅ Notify Navbar (and any listener) about login
+    window.dispatchEvent(new Event("storage"));
+
+    toast.success("Login successful!");
+    navigate("/"); // redirect after login
+  } catch (error) {
+    toast.error(error.response?.data?.error || "Login failed");
+  }
+};
+
 
   return (
     // FIX: Removed `items-center` to align content to the top, and added `pt-12` for top padding.

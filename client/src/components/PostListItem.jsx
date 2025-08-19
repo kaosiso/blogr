@@ -1,6 +1,14 @@
 import React from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+
+
+const fetchPosts = async () => {
+  const res = axios.get(`${import.meta.env.VITE_API_URL}/posts`)
+  return res.data
+}
 
 const PostListItem = ({
   image,
@@ -10,6 +18,20 @@ const PostListItem = ({
   authorImage,
   category,
 }) => {
+  const { isPending, error, data } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: () =>
+      fetch("https://api.github.com/repos/TanStack/query").then((res) =>
+        res.json()
+      ),
+  });
+
+  if (isPending) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
+  console.log(data);
+  console.log(import.meta.env.VITE_SOCKET_PORT); // Should log the port number
+
   return (
     <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
       {/* Image */}

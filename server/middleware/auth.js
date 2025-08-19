@@ -59,8 +59,14 @@ export const verifyToken = (req, res, next) => {
 };
 
 // PROTECTED ROUTE
+// PROTECTED ROUTE
 router.get("/profile", verifyToken, async (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
-});
+  try {
+    const user = await User.findById(req.user.id).select("-password"); // exclude password
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-export default router;
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});

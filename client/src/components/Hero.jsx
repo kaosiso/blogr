@@ -1,9 +1,10 @@
 import React from "react";
 import Image from "./Image";
+import WriteItem from "./writeItem";
 
 const Hero = () => {
   return (
-    <div className="px-4 sm:px-6 mb-8 ">
+    <div className="px-4 sm:px-6 mb-8">
       {/* Heading */}
       <div className="text-start md:text-left">
         {/* Breadcrumb / category */}
@@ -11,10 +12,13 @@ const Hero = () => {
           Home | Health & Science
         </p>
 
-        {/* Heading */}
-        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900">
-          Latest News
-        </h1>
+        {/* Heading and icon with text on big screens */}
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900">
+            Latest News
+          </h1>
+          <WriteItem/>
+        </div>
 
         {/* Subtitle */}
         <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-xl mx-auto md:mx-0 mt-2">
