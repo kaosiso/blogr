@@ -1,5 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config(); 
+dotenv.config({ path: path.resolve(process.cwd(), "server/.env") });
+
+
 import connectDB from "./lib/connectDB.js";
 import cors from "cors";
 import path from "path";
@@ -9,16 +13,24 @@ import postRouter from "./routes/post.route.js";
 import commentRouter from "./routes/comment.route.js";
 import authRouter from "./routes/auth.route.js";
 
-dotenv.config(); // load .env variables
-
+// dotenv.config(); // load .env variables
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
+
 
 // Middleware to parse JSON body
 app.use(express.json());
 
 // Allow CORS
 app.use(cors());
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 // ✅ Serve uploaded images statically
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

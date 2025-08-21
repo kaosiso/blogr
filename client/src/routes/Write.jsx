@@ -3,19 +3,47 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "react-hot-toast"; // ✅ only toast, Toaster stays in MainLayout
+import { toast } from "react-hot-toast"; 
+import CategorySelect from "../components/CategorySelect";
+
+ const authenticator = async () => {
+   try {
+     // Perform the request to the upload authentication endpoint.
+     const response = await fetch(
+       `${import.meta.env.VITE_API_URL}/posts/upload/auth`
+     );
+     if (!response.ok) {
+       // If the server response is not successful, extract the error text for debugging.
+       const errorText = await response.text();
+       throw new Error(
+         `Request failed with status ${response.status}: ${errorText}`
+       );
+     }
+
+     // Parse and destructure the response JSON for upload credentials.
+     const data = await response.json();
+     const { signature, expire, token, publicKey } = data;
+     return { signature, expire, token, publicKey };
+   } catch (error) {
+     // Log the original error for debugging before rethrowing a new error.
+     console.error("Authentication error:", error);
+     throw new Error("Authentication request failed");
+   }
+ };
+
+
 
 const Write = () => {
   const mutation = useMutation({
     mutationFn: async (formData) => {
       const token = localStorage.getItem("token");
-      console.log(token)
       if (!token) throw new Error("No token found");
+      console.log("Token before sending:", localStorage.getItem("token"));
 
       return axios.post(`${import.meta.env.VITE_API_URL}/posts`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+          // "Content-Type": "multipart/form-data",
         },
       });
     },
@@ -46,13 +74,13 @@ const Write = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("category", category);
-    formData.append("description", description);
-    formData.append("content", content);
+    formData.append("description", description); 
+    formData.append("content", content); 
     if (coverImage) formData.append("coverImage", coverImage);
 
     mutation.mutate(formData, {
-      onSuccess: (res) => {
-        toast.success("✅ Post successfully created!");
+      onSuccess: () => {
+        toast.success("Post successfully created!");
         setForm({
           title: "",
           category: "",
@@ -62,7 +90,7 @@ const Write = () => {
         });
       },
       onError: (err) => {
-        toast.error("❌ Failed to create post");
+        toast.error("Failed to create post");
         console.error(err);
       },
     });
@@ -74,7 +102,7 @@ const Write = () => {
         Write a Post
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 ">
         <input
           type="text"
           name="title"
@@ -97,23 +125,10 @@ const Write = () => {
           />
         </div>
 
-        <div className="w-full sm:w-3/4 md:w-1/2 mx-auto">
-          <label className="block mb-2 font-medium text-sm sm:text-base md:text-lg">
-            Category
-          </label>
-          <select
-            name="category"
-            value={category}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 text-sm sm:text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-          >
-            <option value="">Select category</option>
-            <option value="branding">Branding</option>
-            <option value="marketing">Marketing</option>
-            <option value="design">Design</option>
-            <option value="business">Business</option>
-          </select>
-        </div>
+        <CategorySelect
+          value={category}
+          onChange={(val) => setForm((prev) => ({ ...prev, category: val }))}
+        />
 
         <textarea
           name="description"
@@ -135,11 +150,11 @@ const Write = () => {
             className="h-48 sm:h-60 md:h-72"
           />
         </div>
-        <p>this is it</p>
+        <p>palmer palmer</p>
         <button
           type="submit"
           disabled={mutation.isLoading}
-          className="bg-black text-white px-6 py-3 text-sm sm:text-base md:text-lg rounded-lg hover:bg-gray-800 transition w-full disabled:opacity-50"
+          className="bg-black  text-white px-6 py-3 text-sm sm:text-base md:text-lg rounded-lg hover:bg-gray-800 transition w-full disabled:opacity-50"
         >
           {mutation.isLoading ? "Sending..." : "Send"}
         </button>

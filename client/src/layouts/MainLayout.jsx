@@ -8,10 +8,10 @@ const MainLayout = () => {
   return (
     <div>
       <Toaster position="top-right" reverseOrder={false} />
-      <div className="min-h-screen bg-transparent flex flex-col">
+      <div className="min-h-screen bg-transparent fle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 mb-10">
           <Navbar />
-          <main className="py-6 sm:py-8">
+          <main className="py-0 sm:py-0">
             <Outlet />
           </main>
           <Footer />

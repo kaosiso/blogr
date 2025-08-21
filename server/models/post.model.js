@@ -8,9 +8,10 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    img: {
+    coverImage: {
       type: String,
     },
+   
     title: {
       type: String,
       required: true,
@@ -25,7 +26,7 @@ const postSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      default: "general"
+      default: "general",
     },
     content: {
       type: [String],

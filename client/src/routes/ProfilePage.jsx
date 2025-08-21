@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "../components/Image";
-
+import { GrStatusGood } from "react-icons/gr";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 const projects = [
   {
     title: "VPN Mobile App",
@@ -32,46 +33,40 @@ const ProfilePage = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
       {/* Profile Header */}
-      <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mb-8 sm:mb-10 gap-6">
+      <div className="flex flex-col md:flex-row items-start md:items-start  mb-4 md:justify-between sm:mb-4 gap-4">
         <div className="flex items-center gap-4 sm:gap-6">
           <Image
             src="featured1.jpeg"
             alt="Profile"
-            className="w-20 h-20 sm:w-28 sm:h-28 rounded-xl object-cover"
+            className="w-20 h-20 sm:w-28 sm:h-28 rounded-[50%] object-cover"
           />
           <div>
             <div className="flex items-center gap-1 sm:gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold">Irene Brooks</h1>
-              <span className="bg-blue-500 text-white px-2 py-0.5 sm:py-1 rounded text-xs sm:text-sm font-medium">
-                PRO
+              <h1 className="text-xl text-gray-700 sm:text-2xl font-bold">
+                Irene Brooks
+              </h1>
+              <span className="rounded text-xl sm:text-2xl font-bold flex items-center justify-center">
+                <RiVerifiedBadgeFill />
               </span>
             </div>
             <p className="text-gray-600 text-sm sm:text-base mt-1 sm:mt-2">
               Interface and Brand Designer based in San Antonio
             </p>
-            <div className="flex gap-2 sm:gap-3 mt-2 sm:mt-3">
-              <button className="bg-black text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-800 transition text-sm sm:text-base">
-                Follow
-              </button>
-              <button className="border px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-100 transition text-sm sm:text-base">
-                Get in touch
-              </button>
-            </div>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="flex gap-4 sm:gap-6 mt-4 md:mt-0">
-          <div className="text-center">
-            <p className="font-bold text-lg sm:text-xl">2,985</p>
+        <div className="flex gap-4 sm:gap-6  md:mt-0 items-start">
+          <div className="text-left">
+            <p className="font-bold text-lg sm:text-xl">25</p>
             <p className="text-gray-500 text-xs sm:text-sm">Followers</p>
           </div>
-          <div className="text-center">
-            <p className="font-bold text-lg sm:text-xl">132</p>
+          <div className="text-left">
+            <p className="font-bold text-lg sm:text-xl">12</p>
             <p className="text-gray-500 text-xs sm:text-sm">Following</p>
           </div>
-          <div className="text-center">
-            <p className="font-bold text-lg sm:text-xl">548</p>
+          <div className="text-left">
+            <p className="font-bold text-lg sm:text-xl">58</p>
             <p className="text-gray-500 text-xs sm:text-sm">Likes</p>
           </div>
         </div>

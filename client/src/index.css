@@ -24,3 +24,10 @@ body {
   -ms-overflow-style: none; 
   scrollbar-width: none;    
 }
+
+/* In your main container CSS */
+.app {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #fefae0; /* or your chosen background */
+}

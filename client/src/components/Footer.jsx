@@ -4,7 +4,7 @@ import Image from "./Image";
 
 const Footer = () => {
   return (
-    <footer className="py-12 border-t border-gray-200">
+    <footer className="py-4 border-t border-gray-200">
       <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
         {/* Column 1 */}
         <div>
