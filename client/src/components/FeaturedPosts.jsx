@@ -57,8 +57,8 @@ const FeaturedPosts = () => {
   return (
     <div className="mb-12 overflow-x-hidden px-4 md:px-8">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-          Featured blog posts
+        <h3 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl  text-gray-900">
+          Featured
         </h3>
         <a
           href="#"

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaApple, FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import Image from "../components/Image";
-import { register } from "../services/authService";
+import { useAuth } from "../context/AuthContext"; // ✅ fixed import
 import { toast } from "react-hot-toast";
 
 const RegisterPage = () => {
@@ -10,25 +10,24 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { register } = useAuth(); // ✅ useAuth instead of useUser
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await register(name, email, password); // pass as separate args
+      await register(name, email, password);
       toast.success("Account created successfully!");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       toast.error(error.response?.data?.error || "Registration failed");
     }
   };
 
-
   return (
     <div className="px-2 md:px-6 lg:px-12 xl:px-24 2xl:px-32 min-h-screen flex items-center justify-center bg-[#fdf6e3]">
-      <div className="w-full max-w-5xl bg-[#fdf6e3] rounded-2xl shadow-2xl shadow-gray-400/50 grid md:grid-cols-2 overflow-hidden">
-        {/* Left Side (Register Form) */}
+      <div className="w-full max-w-5xl bg-[#fdf6e3] rounded-2xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
+        {/* Left Side */}
         <div className="flex flex-col justify-center px-6 py-6 md:py-4">
-          {/* Logo & Heading */}
           <div className="mb-6">
             <Link
               to="/"
@@ -81,15 +80,8 @@ const RegisterPage = () => {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-4">
-            <hr className="flex-1 border-gray-300" />
-            <span className="text-gray-400 text-xs sm:text-sm">OR</span>
-            <hr className="flex-1 border-gray-300" />
-          </div>
-
           {/* Social Register */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 mt-4">
             <button className="flex items-center justify-center gap-2 py-2 sm:py-3 text-sm sm:text-base border rounded-xl hover:bg-gray-100">
               <FaApple className="text-lg" /> Sign up with Apple
             </button>
@@ -107,7 +99,7 @@ const RegisterPage = () => {
           </p>
         </div>
 
-        {/* Right Side (Image / Gradient) */}
+        {/* Right Side */}
         <div className="hidden md:flex flex-col items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-800 p-6">
           <h2 className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
             Join blogr

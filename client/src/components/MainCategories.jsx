@@ -1,15 +1,24 @@
-import React from "react";
-import Categories from "./Categories";
-import Search from "./Search"; // Assuming you have a separate Search component
+import React, { useState } from "react";
+import { categories } from "../data/categories";
 
 const MainCategories = () => {
+  const [active, setActive] = useState("All");
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4 p-2">
-      {/* This is where we "design" the layout by including the child components.
-        The classes below control the positioning and spacing.
-      */}
-      <Categories />
-      <Search />
+    <div className="flex space-x-3 sm:space-x-4 overflow-x-auto sm:overflow-x-hidden pb-2 whitespace-nowrap scrollbar-hide text-xs sm:text-sm md:text-base">
+      {["All", ...categories].map((cat) => (
+        <span
+          key={cat}
+          onClick={() => setActive(cat)}
+          className={`font-semibold cursor-pointer pb-1 border-b-2 ${
+            active === cat
+              ? "text-blue-600 border-blue-600"
+              : "text-gray-900 border-transparent hover:border-blue-600"
+          }`}
+        >
+          {cat}
+        </span>
+      ))}
     </div>
   );
 };

@@ -11,7 +11,7 @@ const postSchema = new mongoose.Schema(
     coverImage: {
       type: String,
     },
-   
+
     title: {
       type: String,
       required: true,
@@ -21,13 +21,10 @@ const postSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    desc: {
+    description: {
       type: String,
     },
-    category: {
-      type: String,
-      default: "general",
-    },
+    category: [{ type: String }],
     content: {
       type: [String],
       default: [],
@@ -40,6 +37,7 @@ const postSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    status: { type: String, enum: ["draft", "published"], default: "draft" },
   },
   { timestamps: true }
 );

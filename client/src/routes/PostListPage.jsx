@@ -1,49 +1,34 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { X } from "lucide-react";
-import PostListItem from "../components/PostListItem";
+import PostList from "../components/PostList";
 import SideMenu from "../components/SideMenu";
+
+const POSTS_PER_PAGE = 6;
 
 const PostListPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-   
-  const posts = [
-    {
-      image: "featured1.jpeg",
-      title: "Understanding Modern Web Design",
-      excerpt:
-        "A deep dive into modern web design Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborumtrends and best practices...",
-      author: "John Doe",
-      authorImage: "featured1.jpeg",
-      category: "Web Design",
+  const {
+    data: posts = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts`);
+      return res.data;
     },
-    {
-      image: "featured1.jpeg",
-      title: "UI/UX Tips for Beginners",
-      excerpt: "Learn the essential UI/UX tips every designer should know...",
-      author: "Jane Smith",
-      authorImage: "featured1.jpeg",
-      category: "UI/UX",
-    },
-    {
-      image: "featured1.jpeg",
-      title: "Marketing Strategies in 2025",
-      excerpt:
-        "Effective marketing strategies for the digital age explained...",
-      author: "Alex Johnson",
-      authorImage: "featured1.jpeg",
-      category: "Marketing",
-    },
-    {
-      image: "featured1.jpeg",
-      title: "Creating Engaging Content",
-      excerpt:
-        "Tips and tricks to keep your audience engaged with your content...",
-      author: "Maria Garcia",
-      authorImage: "featured1.jpeg",
-      category: "Content",
-    },
-  ];
+  });
+
+  const publishedPosts = posts.filter((post) => post.status === "published");
+  const totalPages = Math.ceil(publishedPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = publishedPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE
+  );
 
   return (
     <div className="relative flex mt-8 flex-col lg:flex-row">
@@ -65,12 +50,27 @@ const PostListPage = () => {
           </button>
         </div>
 
-        {/* Post List - one post per row */}
-        <div className="flex flex-col gap-8 mb-8">
-          {posts.map((post, index) => (
-            <PostListItem key={index} {...post} />
-          ))}
-        </div>
+        {/* Post List */}
+        <PostList posts={paginatedPosts} isLoading={isLoading} error={error} />
+
+        {/* Pagination Controls */}
+        {!isLoading && !error && totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 rounded-md border ${
+                  page === currentPage
+                    ? "bg-gray-800 text-white"
+                    : "bg-white text-gray-800 hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* SideMenu on large screens */}

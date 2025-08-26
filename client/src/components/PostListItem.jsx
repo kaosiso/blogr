@@ -1,14 +1,6 @@
-import React from "react";
-import Image from "./Image";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
-
-
-const fetchPosts = async () => {
-  const res = axios.get(`${import.meta.env.VITE_API_URL}/posts`)
-  return res.data
-}
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
+import getRelativeTime from "../utils/getRelativeTime";
 
 const PostListItem = ({
   image,
@@ -16,58 +8,111 @@ const PostListItem = ({
   excerpt,
   author,
   authorImage,
+  authorId,
+  authorSlug,
   category,
+  slug,
+  date, // passed from PostList
 }) => {
-  const { isPending, error, data } = useQuery({
-    queryKey: ["repoData"],
-    queryFn: () =>
-      fetch("https://api.github.com/repos/TanStack/query").then((res) =>
-        res.json()
-      ),
-  });
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  if (isPending) return "Loading...";
-
-  if (error) return "An error has occurred: " + error.message;
-  console.log(data);
-  console.log(import.meta.env.VITE_SOCKET_PORT); // Should log the port number
+  const handleAuthorClick = () => {
+    if (user && user._id === authorId) {
+      navigate("/profile");
+    } else {
+      navigate(`/users/${authorSlug}`);
+    }
+  };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-      {/* Image */}
-      <div className="w-full lg:w-1/3">
-        <Image
-          src={image}
-          className="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover rounded-2xl"
-        />
-      </div>
+    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center p-3 rounded-lg transition">
+      {/* Post Image */}
+      {image && (
+        <div className="flex flex-col w-full gap-2 sm:w-auto">
+          <img
+            src={image}
+            alt={title}
+            className="w-full sm:w-40 h-40 sm:h-28 object-cover rounded-lg flex-shrink-0"
+          />
 
-      {/* Details */}
-      <div className="flex-1 space-y-2 sm:space-y-3 md:space-y-4">
-        <Link
-          to="/test"
-          className="font-semibold hover:underline text-[clamp(1rem,2vw,1.875rem)]"
+          {/* Categories for mobile only (directly under the image) */}
+          <div className="flex flex-wrap gap-2 mt-2 sm:hidden">
+            {category &&
+              (Array.isArray(category)
+                ? category.flatMap((c) => c.split(","))
+                : category.split(",")
+              )
+                .map((tag) => tag.trim())
+                .filter((tag) => tag.length > 0)
+                .map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-block bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+          </div>
+        </div>
+      )}
+
+      {/* Content column */}
+      <div className="flex flex-col justify-between flex-1">
+        {/* Title */}
+        <h2
+          className="text-lg font-semibold text-gray-800 cursor-pointer line-clamp-1 sm:line-clamp-2"
+          onClick={() => navigate(`/posts/${slug}`)}
         >
           {title}
-        </Link>
+        </h2>
 
-        <div className="flex items-center gap-2 text-gray-400 text-[clamp(0.625rem,1vw,0.875rem)]">
-          {authorImage && (
-            <img
-              src={authorImage}
-              alt={author}
-              className="w-6 h-6 rounded-full object-cover"
-            />
-          )}
-          <span>written by</span>
-          <Link className="text-black hover:underline">{author}</Link>
-          <span>on</span>
-          <span className="font-medium text-gray-600">{category}</span>
-        </div>
-
-        <p className="text-gray-700 leading-relaxed text-[clamp(0.875rem,1.5vw,1rem)] line-clamp-3 md:line-clamp-none">
+        {/* Excerpt */}
+        <p className="text-gray-600 text-sm mt-1 line-clamp-1 sm:line-clamp-2">
           {excerpt}
         </p>
+
+        {/* Author, Date & Categories for desktop */}
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          {/* Author */}
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={handleAuthorClick}
+          >
+            <img
+              src={authorImage || "/default-avatar.png"}
+              alt={author}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className="text-sm text-gray-700 truncate">{author}</span>
+          </div>
+
+          {/* Relative Date */}
+          {date && (
+            <span className="text-sm text-gray-700">
+              {getRelativeTime(date)}
+            </span>
+          )}
+
+          {/* Categories for desktop only */}
+          <div className="hidden sm:flex flex-wrap gap-2 ml-2">
+            {category &&
+              (Array.isArray(category)
+                ? category.flatMap((c) => c.split(","))
+                : category.split(",")
+              )
+                .map((tag) => tag.trim())
+                .filter((tag) => tag.length > 0)
+                .map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-block bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+          </div>
+        </div>
       </div>
     </div>
   );

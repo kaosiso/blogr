@@ -1,9 +1,10 @@
 import React from "react";
 import Search from "./Search";
+import { categories } from "../data/categories";
 
 const SideMenu = () => {
   // A hardcoded list of categories.
-  const categories = ["Design", "Gen-Z Stuff", "UI", "UX", "Marketing"];
+  // const categories = ["Design", "Gen-Z Stuff", "UI", "UX", "Marketing"];
 
   return (
     <div

@@ -1,19 +1,43 @@
 import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
+import { categories } from "../data/categories";
 
-const categories = ["Branding", "Marketing", "Design", "Business"];
+export default function CategorySelect({ value = [], onChange }) {
+  const removeCategory = (cat) => {
+    onChange(value.filter((v) => v !== cat));
+  };
 
-export default function CategorySelect({ value, onChange }) {
   return (
-    <div className="w-full  sm:w-3/4 md:w-1/2 ">
+    <div className="w-full sm:w-3/4 md:w-1/2">
       <label className="block mb-2 font-medium text-sm sm:text-base md:text-lg">
-        Category
+        Categories
       </label>
-      <Listbox value={value} onChange={onChange}>
+      <Listbox value={value} onChange={onChange} multiple>
         <div className="relative">
-          <Listbox.Button className="relative w-full cursor-pointer rounded-lg border bg-white py-2 pl-3 pr-10 text-left text-sm sm:text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
-            <span className="block truncate">{value || "Select category"}</span>
+          <Listbox.Button className="relative w-full cursor-pointer rounded-lg border bg-white py-2 pl-3 pr-10 text-left min-h-[60px] text-sm sm:text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-gray-400 flex flex-wrap gap-2 items-center">
+            {value.length > 0 ? (
+              value.map((cat) => (
+                <span
+                  key={cat}
+                  className="flex items-center gap-1 rounded-md bg-gray-200 px-2 py-1 text-sm text-gray-800"
+                >
+                  {cat}
+                  <button
+                    type="button"
+                    className="text-gray-600 hover:text-black"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeCategory(cat);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-400">Select categories</span>
+            )}
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
               <ChevronDown className="h-5 w-5 text-gray-500" />
             </span>
@@ -28,12 +52,12 @@ export default function CategorySelect({ value, onChange }) {
               {categories.map((cat) => (
                 <Listbox.Option
                   key={cat}
+                  value={cat}
                   className={({ active }) =>
                     `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
                       active ? "bg-gray-100 text-black" : "text-gray-700"
                     }`
                   }
-                  value={cat.toLowerCase()}
                 >
                   {({ selected }) => (
                     <>

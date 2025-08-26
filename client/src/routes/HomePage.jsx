@@ -4,15 +4,17 @@ import FeaturedPosts from "../components/FeaturedPosts";
 import Footer from "../components/Footer";
 import CalltoAction from "../components/CalltoAction";
 import PostListPage from "./PostListPage";
-import MainCategories from "../components/MainCategories";
+import MainMenu from "../components/MainMenu";
+import PostList from "../components/PostList";
 const HomePage = () => {
   return (
     <>
       {/* Hero Section */}
       <Hero />
-      <MainCategories/>
-      <FeaturedPosts />
-      <PostListPage/>
+      <MainMenu />
+      <PostList/>
+      {/* <FeaturedPosts /> */}
+      {/* <PostListPage/> */}
       <CalltoAction />
     </>
   );

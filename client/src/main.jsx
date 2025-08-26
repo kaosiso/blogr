@@ -12,9 +12,11 @@ import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
 import SinglePostPage from "./routes/SinglePostPage";
 import ProfilePage from "./routes/ProfilePage";
+import PublicProfilePage from "./routes/PublicProfilePage";
 
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./Context/AuthContext"; // ✅ import your context
 
 // Create the QueryClient
 const queryClient = new QueryClient();
@@ -25,9 +27,18 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/posts", element: <PostListPage /> },
-      { path: "/post/:slug", element: <SinglePostPage /> },
+      { path: "/posts/:slug", element: <SinglePostPage /> },
+
       {
         path: "/write",
+        element: (
+          <ProtectedRoute>
+            <Write />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/edit/:slug",
         element: (
           <ProtectedRoute>
             <Write />
@@ -42,6 +53,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      { path: "/users/:slug", element: <PublicProfilePage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
@@ -50,9 +62,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </AuthProvider>
   </StrictMode>
 );

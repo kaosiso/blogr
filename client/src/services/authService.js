@@ -1,17 +1,11 @@
+// src/services/authService.js
 import axios from "axios";
 
-const API_URL = "http://localhost:5000"; // adjust if needed
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const login = async (email, password) => {
   const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-  const { token, user } = res.data;
-  if (token && user) {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    window.dispatchEvent(new Event("storage"));
-    return user;
-  }
-  throw new Error("Login failed");
+  return res.data; // { token, user }
 };
 
 export const register = async (name, email, password) => {
@@ -20,30 +14,13 @@ export const register = async (name, email, password) => {
     email,
     password,
   });
-  const { token, user } = res.data;
-  if (token && user) {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    window.dispatchEvent(new Event("storage"));
-    return user;
-  }
-  throw new Error("Registration failed");
+  return res.data; // { token, user }
 };
 
-export const getProfile = async () => {
-  const token = localStorage.getItem("token");
+export const getProfile = async (token) => {
   if (!token) return null;
-
-  const res = await axios.get(`${API_URL}/auth/profile`, {
+  const res = await axios.get(`${API_URL}/users/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  const user = res.data.user;
-  if (user) localStorage.setItem("user", JSON.stringify(user));
-  return user;
-};
-
-export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  window.dispatchEvent(new Event("storage"));
+  return res.data.user;
 };

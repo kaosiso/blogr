@@ -31,3 +31,7 @@ body {
   width: 100%;
   background-color: #fefae0; /* or your chosen background */
 }
+
+.ql-video-custom {
+  max-width: 100%;
+}

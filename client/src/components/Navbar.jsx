@@ -6,171 +6,175 @@ import { Link, useNavigate } from "react-router-dom";
 import Image from "./Image";
 import { TbPencilMinus } from "react-icons/tb";
 
-
-const Navbar = () => {
-  const [open, setOpen] = useState(false);
+const Navbar = ({ setSidebarOpen }) => {
+  const [desktopOpen, setDesktopOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadUser = () => {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (
-          !storedUser ||
-          storedUser === "undefined" ||
-          storedUser === "null"
-        ) {
-          setUser(null);
-          return;
-        }
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("Failed to parse user from localStorage:", err);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+      setUser(JSON.parse(storedUser));
+    }
+
+    window.addEventListener("storage", () => {
+      const updatedUser = localStorage.getItem("user");
+      if (
+        updatedUser &&
+        updatedUser !== "undefined" &&
+        updatedUser !== "null"
+      ) {
+        setUser(JSON.parse(updatedUser));
+      } else {
         setUser(null);
       }
-    };
-
-    loadUser();
-    window.addEventListener("storage", loadUser);
-    return () => window.removeEventListener("storage", loadUser);
+    });
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser(null);
+    setMobileOpen(false);
     window.dispatchEvent(new Event("storage"));
     navigate("/");
   };
 
-  return (
-    <div className="w-full h-16 md:h-20 flex items-center justify-between px-4 relative">
-      {/* Logo */}
-      <Link
-        to="/"
-        className="flex items-center gap-3 text-xl md:text-2xl font-bold"
-      >
-        <Image
-          src="logo.png"
-          alt="Blogr Logo"
-          w={32}
-          h={32}
-          className="w-8 h-8"
-        />
-        <span>blogr</span>
-      </Link>
+  const toggleDesktopSidebar = () => {
+    setDesktopOpen(!desktopOpen);
+    if (setSidebarOpen) setSidebarOpen(!desktopOpen);
+  };
 
-      {/* Desktop menu */}
-      <div className="hidden md:flex gap-6 items-center text-base lg:text-lg">
-        {user ? (
-          <>
-            <Link to="/">Home</Link>
-            <Link to="/write" className="flex items-center gap-1">
-              Write a Post <TbPencilMinus className="text-lg" />
+  const toggleMobileMenu = () => setMobileOpen(!mobileOpen);
+
+  const menuItems = user
+    ? [
+        { label: "Home", path: "/" },
+        { label: "Write a Post", path: "/write", icon: <TbPencilMinus /> },
+        { label: "Profile", path: "/profile" },
+        { label: "Logout", action: handleLogout },
+      ]
+    : [
+        { label: "Home", path: "/" },
+        { label: "Trending", path: "/" },
+        { label: "Most Popular", path: "/" },
+        { label: "Login", path: "/login" },
+      ];
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <div
+        className={`hidden lg:flex lg:flex-col lg:h-screen lg:fixed lg:top-0 lg:left-0 border-r-2 z-50
+        ${desktopOpen ? "w-64" : "w-16"} transition-all duration-300`}
+      >
+        {/* Top bar with toggle button and logo */}
+        <div className="flex items-center justify-between p-4">
+          {desktopOpen && (
+            <Link to="/" className="flex items-center gap-2 text-2xl font-bold">
+              <Image
+                src="logo.png"
+                alt="Blogr Logo"
+                w={32}
+                h={32}
+                className="w-8 h-8"
+              />
+              <span>blogr</span>
             </Link>
-            <Link to="/profile">Profile</Link>
-            <button
-              onClick={handleLogout}
-              className="py-2 px-4 text-sm lg:text-base rounded-3xl bg-red-500 text-white hover:bg-red-600"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/">Home</Link>
-            <Link to="/">Trending</Link>
-            <Link to="/">Most Popular</Link>
-            <Link to="/login">
-              <button className="py-2 px-4 text-sm lg:text-base rounded-3xl bg-green-500 text-white hover:bg-green-600">
-                Login
-              </button>
-            </Link>
-          </>
+          )}
+
+          <div className="cursor-pointer" onClick={toggleDesktopSidebar}>
+            {desktopOpen ? (
+              <IoMdClose className="text-gray-700 text-2xl" />
+            ) : (
+              <BiMenuAltRight className="text-gray-700 text-2xl" />
+            )}
+          </div>
+        </div>
+
+        {/* Menu items */}
+        {desktopOpen && (
+          <div className="flex flex-col p-6 gap-4 text-base">
+            {menuItems.map((item, idx) =>
+              item.path ? (
+                <Link key={idx} to={item.path}>
+                  <div className="flex items-center gap-2">
+                    {item.icon} {item.label}
+                  </div>
+                </Link>
+              ) : (
+                <button
+                  key={idx}
+                  onClick={item.action}
+                  className="py-2 px-4 text-sm rounded-3xl bg-red-500 text-white hover:bg-red-600"
+                >
+                  {item.label}
+                </button>
+              )
+            )}
+          </div>
         )}
       </div>
 
-      {/* Mobile menu button */}
-      <div
-        className="md:hidden cursor-pointer text-3xl"
-        onClick={() => setOpen(!open)}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={open ? "close" : "menu"}
-            initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-            animate={{ rotate: 0, opacity: 1, scale: 1 }}
-            exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.3 }}
-          >
-            {open ? (
-              <IoMdClose className="text-gray-700" />
-            ) : (
-              <BiMenuAltRight className="text-gray-700" />
-            )}
-          </motion.div>
-        </AnimatePresence>
+      {/* Mobile Navbar */}
+      <div className="w-full h-16 flex items-center justify-between px-4 border-2 lg:hidden z-50">
+        <Link to="/" className="flex items-center gap-3 text-xl font-bold">
+          <Image
+            src="logo.png"
+            alt="Blogr Logo"
+            w={32}
+            h={32}
+            className="w-8 h-8"
+          />
+          <span>blogr</span>
+        </Link>
+
+        <div className="cursor-pointer text-3xl" onClick={toggleMobileMenu}>
+          {mobileOpen ? (
+            <IoMdClose className="text-gray-700" />
+          ) : (
+            <BiMenuAltRight className="text-gray-700" />
+          )}
+        </div>
       </div>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile Dropdown */}
       <AnimatePresence>
-        {open && (
+        {mobileOpen && (
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute text-sm top-16 left-0 w-full bg-[#fdf6e3] flex flex-col items-center z-50 gap-4 py-6 md:hidden"
+            className="absolute top-16 left-0 w-full bg-[#fdf6e3] flex flex-col items-center z-50 gap-4 py-6 lg:hidden shadow-md"
           >
-            {user ? (
-              <>
-                <Link to="/" onClick={() => setOpen(false)}>
-                  Home
-                </Link>
+            {menuItems.map((item, idx) =>
+              item.path ? (
                 <Link
-                  to="/write"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-2"
+                  key={idx}
+                  to={item.path}
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full text-center py-2 hover:bg-gray-100 rounded"
                 >
-                  Write a Post <TbPencilMinus className="text-xl" />
+                  <div className="flex justify-center items-center gap-1">
+                    {item.icon} {item.label}
+                  </div>
                 </Link>
-
-                <Link to="/profile" onClick={() => setOpen(false)}>
-                  Profile
-                </Link>
+              ) : (
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setOpen(false);
-                  }}
-                  className="py-2 px-4 text-sm rounded-3xl bg-red-500 text-white hover:bg-red-600"
+                  key={idx}
+                  onClick={item.action}
+                  className="w-full text-center py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  Logout
+                  {item.label}
                 </button>
-              </>
-            ) : (
-              <>
-                <Link to="/" onClick={() => setOpen(false)}>
-                  Home
-                </Link>
-                <Link to="/" onClick={() => setOpen(false)}>
-                  Trending
-                </Link>
-                <Link to="/" onClick={() => setOpen(false)}>
-                  Most Popular
-                </Link>
-                <Link to="/login" onClick={() => setOpen(false)}>
-                  <button className="py-2 px-4 text-sm rounded-3xl bg-green-500 text-white hover:bg-green-600">
-                    Login
-                  </button>
-                </Link>
-              </>
+              )
             )}
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
 

@@ -2,44 +2,42 @@ import Post from "../models/post.model.js";
 import jwt from "jsonwebtoken";
 import { getImageKit } from "../lib/imagekit.js";
 
-// ✅ Middleware to check JWT
-export const isAuthenticated = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  console.log("Auth header received:", authHeader);
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = authHeader.split(" ")[1];
-  try {
-    console.log("JWT_SECRET in backend:", process.env.JWT_SECRET);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded JWT:", decoded);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.error("JWT verification error:", err);
-    return res.status(401).json({ message: "Invalid token" });
-  }
-};
-
-// ✅ Get all posts
+// Get all posts
 export const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find({ status: "published" }) 
+      .populate("user", "name image slug") 
+      .sort({ createdAt: -1 });
+
     res.status(200).json(posts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
+export const getMyPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ user: req.user._id }) 
+      .populate("user", "name image")
+      .sort({ createdAt: -1 });
 
-// ✅ Get single post by slug
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get single post by slug
 export const getPost = async (req, res) => {
   try {
-    const post = await Post.findOne({ slug: req.params.slug });
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    const { slug } = req.params;
+
+    const post = await Post.findOne({ slug }).populate("user", "name image"); // ✅ fetch name & image from User
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
     res.status(200).json(post);
   } catch (err) {
     console.error(err);
@@ -47,17 +45,15 @@ export const getPost = async (req, res) => {
   }
 };
 
+
+// Create Post
 export const createPost = async (req, res) => {
-  console.log("req.file:", req.file);
-  console.log("req.body:", req.body);
-
-  const imagekit = getImageKit();
-  console.log("body should show here");
-
   if (!req.user) return res.status(401).json({ message: "Login required" });
 
+  const imagekit = getImageKit();
+
   try {
-    // Generate slug (same as before)
+    // Generate unique slug
     let slug = req.body.title
       .trim()
       .toLowerCase()
@@ -72,19 +68,18 @@ export const createPost = async (req, res) => {
       counter++;
     }
 
-    // Upload file to ImageKit if present
+    // Upload cover image if provided
     let coverImageUrl = null;
     if (req.file) {
       try {
-        const base64Image = req.file.buffer.toString("base64"); // buffer → base64
+        const base64Image = req.file.buffer.toString("base64");
         const uploadedImage = await imagekit.upload({
-          file: base64Image, // ImageKit requires base64 string
+          file: base64Image,
           fileName: `${slug}-cover.png`,
         });
         coverImageUrl = uploadedImage.url;
-        console.log("✅ Uploaded image URL:", coverImageUrl);
       } catch (err) {
-        console.error("❌ ImageKit upload failed:", err.message);
+        console.error("ImageKit upload failed:", err.message);
       }
     }
 
@@ -93,9 +88,10 @@ export const createPost = async (req, res) => {
       slug,
       title: req.body.title,
       category: req.body.category,
-      desc: req.body.description,
+      description: req.body.description,
       content: req.body.content,
       coverImage: coverImageUrl,
+      status: req.body.status || "draft", // default to draft
     });
 
     const post = await newPost.save();
@@ -106,7 +102,7 @@ export const createPost = async (req, res) => {
   }
 };
 
-// ✅ Update Post (only owner)
+// Update Post (only owner) by slug
 export const updatePost = async (req, res) => {
   if (!req.user) {
     return res
@@ -115,15 +111,17 @@ export const updatePost = async (req, res) => {
   }
 
   try {
-    const post = await Post.findById(req.params.id);
+    const { slug } = req.params;
+
+    const post = await Post.findOne({ slug });
     if (!post) return res.status(404).json({ message: "Post not found" });
     if (post.user.toString() !== req.user.id)
       return res
         .status(403)
         .json({ message: "You are not allowed to edit this post" });
 
-    const updatedPost = await Post.findByIdAndUpdate(
-      req.params.id,
+    const updatedPost = await Post.findOneAndUpdate(
+      { slug },
       { $set: req.body },
       { new: true, runValidators: true }
     );
@@ -135,7 +133,7 @@ export const updatePost = async (req, res) => {
   }
 };
 
-// ✅ Delete Post (only owner)
+// ✅ Delete Post (only owner) by slug
 export const deletePost = async (req, res) => {
   if (!req.user) {
     return res
@@ -144,7 +142,9 @@ export const deletePost = async (req, res) => {
   }
 
   try {
-    const post = await Post.findById(req.params.id);
+    const { slug } = req.params;
+
+    const post = await Post.findOne({ slug });
     if (!post) return res.status(404).json({ message: "Post not found" });
     if (post.user.toString() !== req.user.id)
       return res
@@ -168,5 +168,24 @@ export const uploadAuth = (req, res) => {
   } catch (err) {
     console.error("ImageKit error:", err);
     res.status(500).json({ message: "ImageKit auth error" });
+  }
+};
+
+// ✅ Upload file to ImageKit
+export const uploadFile = async (req, res) => {
+  try {
+    const imagekit = getImageKit();
+    const base64File = req.file.buffer.toString("base64");
+    const fileName = req.file.originalname;
+
+    const uploadResponse = await imagekit.upload({
+      file: base64File,
+      fileName,
+    });
+
+    res.status(200).json({ url: uploadResponse.url });
+  } catch (err) {
+    console.error("Upload failed:", err);
+    res.status(500).json({ message: "File upload failed", error: err.message });
   }
 };
