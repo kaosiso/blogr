@@ -30,20 +30,20 @@ const SinglePostPage = () => {
   return (
     <div className="max-w-4xl mx-auto  py-2 relative">
       {/* Date */}
-      <p className="text-gray-500 text-sm text-center">
+      <p className="text-gray-500 text-sm text-left">
         Published {getRelativeTime(post.createdAt)}
       </p>
 
       {/* Title */}
-      <h1 className="text-2xl sm:text-4xl md:text-3xl font-extrabold text-center mt-2">
+      <h1 className="text-2xl sm:text-4xl md:text-3xl font-extrabold text-left mt-2">
         {post.title}
       </h1>
       {/* Subtitle */}
-      <p className="text-gray-600 text-base sm:text-lg text-center mt-2">
+      <p className="text-gray-600 text-base sm:text-lg text-left mt-2">
         {post.description}
       </p>
       {/* Categories */}
-      <div className="flex flex-wrap justify-center gap-3 mt-4">
+      <div className="flex flex-wrap text-left gap-3 mt-4">
         {(Array.isArray(post.category)
           ? post.category[0]?.split(",") // split the first string
           : post.category?.split(",")

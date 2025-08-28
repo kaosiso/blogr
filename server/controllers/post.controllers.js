@@ -3,18 +3,35 @@ import jwt from "jsonwebtoken";
 import { getImageKit } from "../lib/imagekit.js";
 
 // Get all posts
+// export const getPosts = async (req, res) => {
+//   try {
+//     const posts = await Post.find({ status: "published" })
+//       .populate("user", "name image slug")
+//       .sort({ createdAt: -1 });
+
+//     res.status(200).json(posts);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 export const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find({ status: "published" }) 
-      .populate("user", "name image slug") 
-      .sort({ createdAt: -1 });
+    const posts = await Post.find({ status: "published" })
+      .populate("user", "name image slug") // fetch author info
+      .sort({ createdAt: -1 })
+      .lean();
 
-    res.status(200).json(posts);
+    // Filter out posts with missing user
+    const safePosts = posts.filter((post) => post.user !== null);
+
+    res.status(200).json(safePosts);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("getPosts error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 export const getMyPosts = async (req, res) => {
   try {
     const posts = await Post.find({ user: req.user._id }) 

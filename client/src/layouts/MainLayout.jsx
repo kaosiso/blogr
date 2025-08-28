@@ -8,22 +8,25 @@ const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true); // desktop sidebar
 
   return (
-    <div className="flex flex-col mx-auto lg:flex-row min-h-screen bg-transparent">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-transparent">
       <Toaster position="top-right" reverseOrder={false} />
 
-      {/* Navbar */}
+      {/* Navbar / Sidebar */}
       <Navbar setSidebarOpen={setSidebarOpen} />
 
-      {/* Main content */}
+      {/* Main content wrapper */}
       <div
-        className={`flex flex-col transition-all duration-300
-      lg:${sidebarOpen ? "ml-64" : "ml-16"} ml-0`}
+        className={`
+          flex-1 flex justify-center transition-all duration-300
+          ml-0   /* mobile */
+          ${sidebarOpen ? "lg:ml-64" : "lg:ml-10"} /* desktop */
+        `}
       >
-        <main className="px-4 sm:px-6 lg:px-8 py-6">
+        {/* Inner content (centered & max width) */}
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <Outlet />
-        </main>
-
-        <Footer />
+          <Footer />
+        </div>
       </div>
     </div>
   );

@@ -37,6 +37,13 @@ const postSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    reports: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        reason: { type: String, default: "Not specified" },
+        reportedAt: { type: Date, default: Date.now },
+      },
+    ],
     status: { type: String, enum: ["draft", "published"], default: "draft" },
   },
   { timestamps: true }

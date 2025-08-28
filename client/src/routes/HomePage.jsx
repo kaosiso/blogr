@@ -12,9 +12,9 @@ const HomePage = () => {
       {/* Hero Section */}
       <Hero />
       <MainMenu />
-      <PostList/>
+      {/* <PostList/> */}
       {/* <FeaturedPosts /> */}
-      {/* <PostListPage/> */}
+      <PostListPage/>
       <CalltoAction />
     </>
   );

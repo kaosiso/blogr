@@ -3,20 +3,40 @@ import Image from "./Image";
 import WriteItem from "./writeItem";
 
 const Hero = () => {
-  // Sample top picks data
+  // Updated top picks data with richer info
   const topPicks = [
-    { title: "How to Improve UX", time: "2 hrs ago" },
-    { title: "Design Trends 2025", time: "1 day ago" },
-    { title: "Sustainable Retail", time: "3 days ago" },
-    { title: "Maximizing Team Productivity", time: "4 days ago" },
-    { title: "Creative Workflows in Design", time: "5 days ago" },
+    {
+      title: "Flavors & Feasts: Latest Culinary Trends and Savory Delights",
+      author: "Leonor Davinci",
+      category: "Business",
+      time: "2h Ago",
+      img: "featured3.jpeg",
+      live: true,
+    },
+    {
+      title: "How to Improve UX",
+      author: "Frankie Sullivan",
+      category: "Design",
+      time: "2 hrs ago",
+      img: "featured1.jpeg",
+      live: false,
+    },
+    {
+      title: "Design Trends 2025",
+      author: "Alex Morgan",
+      category: "Retail",
+      time: "1 day ago",
+      img: "featured2.jpeg",
+      live: false,
+    },
+
   ];
 
   return (
     <div className="px-4 sm:px-6 mb-8">
       {/* Heading */}
       <div className="text-start md:text-left">
-        <p className="text-sm sm:text-sm md:text-base text-blue-700 mb-2">
+        <p className="text-sm sm:text-base text-blue-700 mb-2">
           Home | Health & Science
         </p>
 
@@ -34,23 +54,23 @@ const Hero = () => {
       </div>
 
       {/* Hero + Top Picks Layout */}
-      <div className="flex flex-col mx-auto lg:flex-row gap-6 mt-6">
+      <div className="flex flex-col lg:flex-row gap-6 mt-6">
         {/* Hero Image */}
-        <div className="relative w-full lg:w-3/4 h-auto rounded-xl overflow-hidden shadow-lg">
+        <div className="relative flex-1 h-[260px] sm:h-[340px] md:h-[380px] lg:h-[420px] rounded-xl overflow-hidden shadow-lg">
           <Image
             src="featured3.jpeg"
             alt="A person working in a creative space"
-            className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[80vh] object-cover"
+            className="w-full h-full object-cover"
           />
 
           {/* Overlay content */}
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3 sm:p-6">
-            <h2 className="text-xs sm:text-sm md:text-2xl font-thin leading-snug line-clamp-3">
+          <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-3 sm:p-6 z-10">
+            <h2 className="text-sm sm:text-lg md:text-xl font-light leading-snug line-clamp-3">
               Sophia Mesaphis from Untitled Ventures on Sustainable and
               Profitable Growth & What We Can Learn from the Gunroad Mass
             </h2>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-gray-200 mt-2 pt-2 gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-white/30 mt-2 pt-2 gap-3">
               <div className="flex flex-row items-center space-x-4 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-gray-200"></div>
@@ -80,21 +100,50 @@ const Hero = () => {
         </div>
 
         {/* Top Picks Sidebar */}
-        <div className="w-full lg:w-1/3 flex flex-col gap-4">
-          <h3 className="text-lg lg:text-xl font-semibold text-gray-900">
+        {/* Top Picks Sidebar */}
+        <div className="w-full lg:w-1/3 flex flex-col gap-4 lg:h-[420px]">
+          {/* <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">
             Top Picks
-          </h3>
-          <div className="flex flex-col gap-3">
-            {topPicks.slice(0, 5).map((item, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gray-200 rounded-lg flex-shrink-0"></div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-gray-800 lg:text-base">
-                    {item.title}
-                  </span>
-                  <span className="text-xs text-gray-500 lg:text-sm">
-                    {item.time}
-                  </span>
+          </h3> */}
+
+          {/* Styled Top Picks Items */}
+          <div className="flex flex-col gap-3 flex-1 justify-between">
+            {topPicks.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-col p-3 rounded-lg border border-gray-200 shadow-sm"
+              >
+                {/* Top row: thumbnail + title */}
+                <div className="flex gap-3">
+                  {/* Thumbnail */}
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex-shrink-0 overflow-hidden relative">
+                    <Image
+                      src={item.img}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                    {item.live && (
+                      <span className="absolute top-1 left-1 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full">
+                        LIVE
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  <div className="flex-1 flex flex-col">
+                    <span className="font-medium text-gray-800 line-clamp-2">
+                      {item.title}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Meta info below the thumbnail + title row */}
+                <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
+                  <span>{item.author}</span>
+                  <span>•</span>
+                  <span>{item.category}</span>
+                  <span>•</span>
+                  <span>{item.time}</span>
                 </div>
               </div>
             ))}

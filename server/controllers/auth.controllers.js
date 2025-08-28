@@ -26,10 +26,12 @@ export const register = async (req, res) => {
     const newUser = new User({ name, email, password: hashedPassword, slug });
     await newUser.save();
 
-    // sign JWT with "id"
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // sign JWT with "id" and "role"
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.status(201).json({
       message: "User registered successfully!",
@@ -38,8 +40,9 @@ export const register = async (req, res) => {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
-        slug: newUser.slug, // include slug in response
-        profileImage: newUser.profileImage || null,
+        slug: newUser.slug,
+        profileImage: newUser.image || null,
+        role: newUser.role,
       },
     });
   } catch (error) {
@@ -56,14 +59,33 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ error: "Invalid credentials" });
 
+    // 🚨 Check if suspended
+    if (user.isSuspended) {
+      // if suspendedUntil is in the past → auto-unsuspend
+      if (user.suspendedUntil && user.suspendedUntil < new Date()) {
+        user.isSuspended = false;
+        user.suspendedUntil = null;
+        user.suspensionReason = "";
+        await user.save();
+      } else {
+        return res.status(403).json({
+          error: "Your account is suspended",
+          until: user.suspendedUntil,
+          reason: user.suspensionReason,
+        });
+      }
+    }
+
     // check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
 
-    // sign JWT with "id"
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // sign JWT with "id" and "role"
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     res.json({
       message: "Login successful",
@@ -72,8 +94,9 @@ export const login = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        slug: user.slug, // include slug in login response
-        profileImage: user.profileImage || null,
+        slug: user.slug,
+        profileImage: user.image || null,
+        role: user.role,
       },
     });
   } catch (error) {
