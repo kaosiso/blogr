@@ -14,11 +14,11 @@ export default function TopWriters() {
         {writers.map((writer, index) => (
           <div
             key={index}
-            className="flex items-center border-2 border-gray-200 justify-between  rounded-xl p-3"
+            className="flex items-center  justify-between  rounded-xl"
           >
             {/* Avatar + Name */}
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold">
+              <div className="w-[40px] h-[40px] rounded-full bg-blue-300 flex items-center justify-center text-white font-bold">
                 <span>👩</span>
               </div>
               <div>

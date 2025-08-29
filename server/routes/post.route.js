@@ -7,7 +7,8 @@ import {
   deletePost,
   uploadAuth,
   uploadFile,
-  updatePost
+  updatePost,
+  getSearchPosts, // ✅ add this
 } from "../controllers/post.controllers.js";
 import { isAuthenticated } from "../middleware/auth.js";
 
@@ -17,6 +18,9 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.get("/", getPosts); // List all posts
+// Search posts with filters + pagination
+router.get("/search", getSearchPosts);
+
 router.post("/upload", isAuthenticated, upload.single("file"), uploadFile); // Upload file
 router.get("/upload/auth", isAuthenticated, uploadAuth); // ImageKit auth
 

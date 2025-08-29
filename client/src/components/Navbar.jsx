@@ -5,12 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import Image from "./Image";
 import { TbPencilMinus } from "react-icons/tb";
+import { Search } from "lucide-react";
 
 const Navbar = ({ setSidebarOpen }) => {
   const [desktopOpen, setDesktopOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const [showSearch, setShowSearch] = useState(false);
+
+  // Toggle function
+  const toggleSearch = () => setShowSearch(!showSearch);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -130,12 +135,22 @@ const Navbar = ({ setSidebarOpen }) => {
           <span>blogr</span>
         </Link>
 
-        <div className="cursor-pointer text-3xl" onClick={toggleMobileMenu}>
-          {mobileOpen ? (
-            <IoMdClose className="text-gray-700" />
-          ) : (
-            <BiMenuAltRight className="text-gray-700" />
-          )}
+        {/* Right-side controls: menu + search */}
+        <div className="flex items-center gap-4">
+           {/* Search button */}
+          <div className="cursor-pointer text-2xl" onClick={toggleSearch}>
+            <Search className="text-gray-700" />
+          </div>
+          {/* Menu button */}
+          <div className="cursor-pointer text-3xl" onClick={toggleMobileMenu}>
+            {mobileOpen ? (
+              <IoMdClose className="text-gray-700" />
+            ) : (
+              <BiMenuAltRight className="text-gray-700" />
+            )}
+          </div>
+
+         
         </div>
       </div>
 
